@@ -8,22 +8,25 @@ from datetime import date
 
 db = peewee.SqliteDatabase('people.db')
 
+
 class Person(peewee.Model):
     name = peewee.CharField()
     birthday = peewee.DateField()
     is_relative = peewee.BooleanField()
-    
+
     class Meta:
         database = db
+
 
 class Pet(peewee.Model):
     owner = peewee.ForeignKeyField(Person, related_name='pets')
     name = peewee.CharField()
     animal_type = peewee.CharField()
-    
+
     class Meta:
         database = db
-        
+
+
 def main():
     # connect or create database
     db.connect()
@@ -39,21 +42,21 @@ def main():
     grandma.name = 'Grandma L.'
     grandma.save()
     # add pet
-    bob_kitty = Pet.create(owner=uncle_bob, name='Kitty', animal_type='cat')
+    Pet.create(owner=uncle_bob, name='Kitty', animal_type='cat')
     herb_fido = Pet.create(owner=herb, name='Fido', animal_type='dog')
     herb_mittens = Pet.create(owner=herb, name='Mittens', animal_type='cat')
-    herb_mittens_jr = Pet.create(owner=herb, name='Mittens Jr', animal_type='cat')
+    Pet.create(owner=herb, name='Mittens Jr', animal_type='cat')
     # remove pet
     herb_mittens.delete_instance()
     # update owner
     herb_fido.owner = uncle_bob
     herb_fido.save()
- 
+
     # get a single record from the database by using SelectQuery.get()
     grandma = Person.select().where(Person.name == 'Grandma L.').get()
     # or Model.get()
     grandma = Person.get(Person.name == 'Grandma L.')
-    
+
     # lists of records
     for person in Person.select():
         print(person.name, person.is_relative)
@@ -68,7 +71,7 @@ def main():
     # use join
     for pet in Pet.select().join(Person).where(Person.name == 'Bob'):
         print(pet.name)
-    # or 
+    # or
     for pet in Pet.select().where(Pet.owner == uncle_bob):
         print(pet.name)
     # use order_by
@@ -99,6 +102,7 @@ def main():
         print(person.name)
     # close database
     db.close()
-        
+
+
 if __name__ == '__main__':
     main()
